@@ -7,6 +7,7 @@ export function ApiStack({ stack }: StackContext) {
   // Create the API using sst api construct
   const api = new Api(stack, "Api", {
     defaults: {
+      authorizer: "iam",
       function: {
         bind: [table],   // this binds to the DynamoDB table
       },

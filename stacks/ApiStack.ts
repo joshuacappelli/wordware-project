@@ -13,6 +13,9 @@ export function ApiStack({ stack }: StackContext) {
         bind: [table, HUGGING_FACE_SECRET_KEY],   // this binds to the DynamoDB table
       },
     },
+    cors: {
+      allowMethods: ["GET"],
+    },
     routes: {
       "POST /prompts": "packages/functions/src/create.main",
       "GET /prompts/{id}": "packages/functions/src/get.main",

@@ -11,8 +11,8 @@ export const main = handler(async (event) => {
       body: JSON.stringify({ error: "Model or Prompt missing" }),
     });
   }
-
   const HUGGING_FACE_TOKEN = Config.HUGGING_FACE_SECRET_KEY;
+
 
   try {
     const response = await axios.post(

@@ -7,7 +7,7 @@ export const main = handler(async (event) => {
     TableName: Table.Prompts.tableName,
     Key: {
       userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId, // The id of the author
-      noteId: event?.pathParameters?.id, // The id of the note from the path
+      promptId: event?.pathParameters?.id, // The id of the prompt from the path
     },
   };
 

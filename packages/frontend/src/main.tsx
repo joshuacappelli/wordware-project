@@ -24,7 +24,7 @@ Amplify.configure({
     endpoints: [
       {
         name: "prompts",
-        endpoint: config.apiGateway.URL,
+        endpoint: config.apiGateway.URL + "/",
         region: config.apiGateway.REGION,
       },
     ],

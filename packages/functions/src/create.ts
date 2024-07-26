@@ -7,6 +7,7 @@ export const main = handler(async (event) => {
   let data = {
     content: "",
     attachment: "",
+    variables: "",
   };
 
   if (event.body != null) {
@@ -21,6 +22,7 @@ export const main = handler(async (event) => {
       promptId: uuid.v1(), // A unique uuid
       content: data.content, // Parsed from request body
       attachment: data.attachment, // Parsed from request body
+      variables: data.variables,
       createdAt: Date.now(), // Current Unix timestamp
     },
   };

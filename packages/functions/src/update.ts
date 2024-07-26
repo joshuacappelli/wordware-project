@@ -10,7 +10,7 @@ export const main = handler(async (event) => {
     Key: {
       // The attributes of the item to be created
       userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId, // The id of the author
-      promptId: event?.pathParameters?.id, // The id of the note from the path
+      promptId: event?.pathParameters?.id, // The id of the prompt from the path
     },
     // 'UpdateExpression' defines the attributes to be updated
     // 'ExpressionAttributeValues' defines the value in the update expression

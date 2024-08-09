@@ -1,7 +1,7 @@
 import { Bucket, StackContext, Table } from "sst/constructs";
+
 export function StorageStack({ stack }: StackContext) {
-  // Create the DynamoDB table
-  // Create an S3 bucket
+  // Create the S3 bucket
   const bucket = new Bucket(stack, "Uploads", {
     cors: [
       {
@@ -12,12 +12,22 @@ export function StorageStack({ stack }: StackContext) {
       },
     ],
   });
+
   const table = new Table(stack, "Prompts", {
     fields: {
       userId: "string",
       promptId: "string",
+      outputId: "string", // New field for output ID
+      type: "string",     // Attribute to distinguish between prompt and output
     },
     primaryIndex: { partitionKey: "userId", sortKey: "promptId" },
+    globalIndexes: {
+      GSI1: {
+        partitionKey: "promptId",
+        sortKey: "type",
+        projection: "all",
+      },
+    },
   });
 
   return {

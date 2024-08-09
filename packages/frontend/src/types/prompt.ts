@@ -3,8 +3,6 @@ export interface PromptType {
     content: string;
     createdAt?: string;
     attachment?: string;
-    description?: string;
-    title?: string;
-    variables?: string;
+    description: string;
     attachmentURL?: string;
   }

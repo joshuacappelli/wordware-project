@@ -1,9 +1,103 @@
-.Home .lander {
-    padding: 80px 0;
+.Home {
+    padding: 50px 0;
     text-align: center;
   }
   
-  .Home .lander h1 {
+  .Home h1 {
     font-family: "Open Sans", sans-serif;
     font-weight: 600;
   }
+
+
+  .lander {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align items to the start (left) */
+    justify-content: center;
+    
+    color: rgb(0, 0, 0);
+    text-align: left; /* Text align left */
+    padding: 20px;
+    padding-left: 50px; /* Add some padding to the left */
+  }
+  
+  
+  .lander h1 {
+    font-size: 3em;
+    margin-bottom: 20px;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .lander p {
+    font-size: 1.5em;
+    max-width: 600px;
+    color: rgb(249, 189, 92)
+  }
+
+  .prompts-container {
+    padding: 20px;
+  }
+  
+  .prompts-container h2 {
+    text-align: left; /* Align the header text to the left */
+    margin-left: 20px;
+  }
+  
+  .prompts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .prompts-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px !important; /* Ensure border radius is applied */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+  }
+  
+  .prompts-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .card-header {
+    font-size: 1.25em;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .card-content {
+    font-size: 1em;
+    color: #333;
+  }
+
+  
+  .create-prompt-btn {
+    background-color: black !important;
+    color: white !important;
+    border-radius: 8px !important;
+    border: 1px solid #000 !important;
+    padding: 10px 20px !important;
+    width: auto !important; /* Ensure the width is auto */
+    margin: 20px auto !important; /* Center-align the button */
+    cursor: pointer !important; /* Ensure it looks like a clickable button */
+    transition: background-color 0.3s, color 0.3s !important;
+    display: inline-block !important; /* Make it inline-block to restrict width */
+    text-align: center; /* Center text */
+  }
+  
+  .create-prompt-btn:hover {
+    background-color: lightgray !important; /* Ensure the hover effect applies */
+    color: black !important; /* Ensure the hover effect applies */
+  }
+
+  .spinning-container {
+    animation: spin 1s infinite linear;
+  }
+  

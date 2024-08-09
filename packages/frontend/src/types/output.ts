@@ -1,6 +1,7 @@
 export interface OutputType {
-    attachment?: string;
-    title?: string;
+    content?: string;
     promptId?: string;
     outputId?: string;
+    title?: string;
+    createdAt?: string;
 }

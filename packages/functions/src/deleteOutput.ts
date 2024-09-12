@@ -1,22 +1,21 @@
+import { APIGatewayProxyHandler } from "aws-lambda";
 import { Table } from "sst/node/table";
 import handler from "@wordware/core/handler";
 import dynamoDb from "@wordware/core/dynamodb";
 
-export const main = handler(async (event) => {
-  const { userId, promptId, outputId } = event.pathParameters || {};
 
-  if (!userId || !promptId || !outputId) {
-    throw new Error("Missing required path parameters: userId, promptId, or outputId");
-  }
+export const main = handler(async (event) => {
+  const { outputId } = event.pathParameters || {};
 
   const params = {
-    TableName: Table.Prompts.tableName,
+    TableName: Table.Prompts.tableName, 
     Key: {
-      userId,
-      promptId,
-      outputId
+      userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId, 
+      promptId: outputId,
     },
   };
+
+  console.log(params);
 
   await dynamoDb.delete(params);
 

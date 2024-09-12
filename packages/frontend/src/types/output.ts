@@ -1,7 +1,8 @@
 export interface OutputType {
-    content?: string;
+    content: string;
     promptId?: string;
     outputId?: string;
-    title?: string;
+    connectionId?: string;
+    title: string;
     createdAt?: string;
 }

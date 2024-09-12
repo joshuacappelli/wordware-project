@@ -1,23 +1,42 @@
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import AWS from "aws-sdk";
 import { Table } from "sst/node/table";
-import handler from "@wordware/core/handler";
-import dynamoDb from "@wordware/core/dynamodb";
 
-export const main = handler(async (event) => {
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
+
+export const main = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  const userId = event.requestContext.authorizer?.iam.cognitoIdentity.identityId;
+
+  if (!userId) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Missing user identity" }),
+    };
+  }
+
   const params = {
     TableName: Table.Prompts.tableName,
-    // 'KeyConditionExpression' defines the condition for the query
-    // - 'userId = :userId': only return items with matching 'userId'
-    //   partition key
     KeyConditionExpression: "userId = :userId",
-    // 'ExpressionAttributeValues' defines the value in the condition
-    // - ':userId': defines 'userId' to be the id of the author
     ExpressionAttributeValues: {
-      ":userId": event.requestContext.authorizer?.iam.cognitoIdentity.identityId,
+      ":userId": userId,
     },
   };
 
-  const result = await dynamoDb.query(params);
+  try {
+    const result = await dynamoDb.query(params).promise();
 
-  // Return the matching list of items in response body
-  return JSON.stringify(result.Items);
-});
+    // Filter the results to include only items with type 'prompt'
+    const filteredItems = result.Items?.filter(item => item.type === 'prompt') || [];
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(filteredItems),
+    };
+  } catch (error) {
+    console.error("DynamoDB Query Error", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Could not retrieve prompts" }),
+    };
+  }
+};

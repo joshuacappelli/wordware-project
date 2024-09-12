@@ -52,6 +52,9 @@
   }
   
   .prompts-card {
+    display: flex;
+    flex-direction: column; /* Allows stacking elements vertically */
+    align-items: center; 
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 8px !important; /* Ensure border radius is applied */
@@ -60,6 +63,12 @@
     transition: transform 0.3s, box-shadow 0.3s;
     cursor: pointer;
   }
+
+  .prompt-title {
+    text-align: center; /* Centers the text within the element */
+    width: 100%; /* Ensures the title spans the full width of its container */
+  }
+  
   
   .prompts-card:hover {
     transform: translateY(-5px);
@@ -70,6 +79,12 @@
     font-size: 1.25em;
     font-weight: bold;
     margin-bottom: 10px;
+    
+      display: flex;
+      justify-content: space-between; /* Spaces out the title and dropdown button */
+      align-items: center; /* Vertically centers the content */
+      width: 100%; /* Ensures the header spans the full width of its container */
+    
   }
   
   .card-content {
@@ -100,4 +115,27 @@
   .spinning-container {
     animation: spin 1s infinite linear;
   }
+
+  /* Custom CSS to hide the dropdown arrow */
+.custom-dropdown-toggle::after {
+  display: none !important; /* Hides the dropdown arrow */
+}
+
+/* Ensure the button is displayed inline with other content */
+.custom-dropdown-toggle {
+  display: inline-flex; /* Aligns it inline with the text */
+  align-items: center; /* Vertically centers the dots with the text */
+  color: black; /* Makes the three dots black */
+  background: none; /* Removes any default background */
+  border: none; /* Removes any default border */
+  padding: 0; /* Removes any default padding */
+  font-size: 1.25rem; /* Adjust size of the three dots */
+}
+
+.custom-dropdown-toggle:hover {
+  color: #333 !important; /* Optionally, change color on hover */
+}
+
+
+
   

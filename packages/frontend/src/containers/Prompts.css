@@ -69,5 +69,69 @@
       transform: rotate(360deg);
     }
   }
+
+
+  /* Container for the outputs */
+.outputs {
+  width: max-content;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+
+/* Style for each output card */
+.output {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+/* Hover effect for the output card */
+.output:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Header style for the output card */
+.output h1 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* Content style for the output card */
+.output p {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Optional: Responsive design adjustments */
+@media (max-width: 768px) {
+  .outputs {
+    padding: 10px;
+  }
+
+  .output {
+    padding: 15px;
+  }
+
+  .output h1 {
+    font-size: 1.25rem;
+  }
+
+  .output p {
+    font-size: 0.875rem;
+  }
+}
+
   
   

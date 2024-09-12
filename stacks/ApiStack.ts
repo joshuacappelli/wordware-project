@@ -28,6 +28,7 @@ export function ApiStack({ stack }: StackContext) {
       // routes for outputs
       "POST /prompts/{promptId}/outputs": "packages/functions/src/createOutput.main",
       "GET /prompts/{promptId}/outputs": "packages/functions/src/getOutputs.main",
+      "DELETE /outputs/{outputId}": "packages/functions/src/deleteOutput.main",
     },
   });
 

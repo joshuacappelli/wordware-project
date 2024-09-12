@@ -17,12 +17,17 @@ export const main = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxy
 
   const params = {
     TableName: Table.Prompts.tableName,
-    KeyConditionExpression: "userId = :userId AND promptId = :promptId",
+    IndexName: 'GSI3', // Replace with your GSI name
+    KeyConditionExpression: "connectionId = :connectionId AND #type = :type",
+    ExpressionAttributeNames: {
+      "#type": "type",
+    },
     ExpressionAttributeValues: {
-      ":userId": userId,
-      ":promptId": promptId,
+      ":connectionId": promptId, // Filter for items where connectionId matches
+      ":type": "output",        // Filter for items where type is 'output'
     },
   };
+  
 
   try {
     const result = await dynamoDb.query(params).promise();

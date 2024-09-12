@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import ListGroup from "react-bootstrap/ListGroup";
 import { useAppContext } from "../lib/contextLib";
-import { useNavigate } from "react-router-dom";
 import "./Home.css";
 import { API } from "aws-amplify";
 import { PromptType } from "../types/prompt";
@@ -10,7 +9,10 @@ import { BsPencilSquare, BsThreeDotsVertical } from "react-icons/bs";
 import { LinkContainer } from "react-router-bootstrap";
 import Dropdown from "react-bootstrap/Dropdown";
 import { OutputType } from "../types/output";
+import Button from "react-bootstrap/Button";
 import ModelSelectionModal from "./ModelSelectionModal";
+import VariableInputModal from "./VariableInputModal"; // Import the modal for variables
+
 
 export default function Home() {
   const [prompts, setPrompts] = useState<Array<PromptType>>([]);
@@ -18,6 +20,11 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showVarModal, setShowVarModal] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<string | null>(null); // Store selected model
+  const [variables, setVariables] = useState<Array<string>>([]); // Store variables from prompt content
+  const [variableValues, setVariableValues] = useState<{ [key: string]: string }>({}); // Store input values for variables
+
   const [selectedPrompt, setSelectedPrompt] = useState<PromptType | null>(null);
 
   useEffect(() => {
@@ -41,8 +48,12 @@ export default function Home() {
   }, [isAuthenticated]);
 
   function loadPrompts() {
-    return API.get("prompts", "/prompts", {});
+    return API.get("prompts", "/prompts", {}).then(response => {
+      console.log("API Response:", response);
+      return response;
+    });
   }
+  
 
   function formatDate(str: undefined | string) {
     return !str ? "" : new Date(str).toLocaleDateString();
@@ -54,6 +65,12 @@ export default function Home() {
     }
     return text;
   }
+
+  function extractVariables(content: string): string[] {
+    const matches = content.match(/@\w+/g) || [];
+    return matches.map((variable) => variable.slice(1)); // Remove '@' from variable names
+  }
+  
 
   function deletePrompt(promptId: string | undefined) {
     return API.del("prompts", `/prompts/${promptId}`, {});
@@ -88,6 +105,38 @@ export default function Home() {
     });
   }
 
+  async function handleSaveVariables() {
+    if (!selectedPrompt || !selectedModel) return;
+
+    // Replace variables in the prompt content
+    let updatedContent = selectedPrompt.content;
+    Object.keys(variableValues).forEach((variable) => {
+      updatedContent = updatedContent.replace(`@${variable}`, variableValues[variable]);
+    });
+
+    try {
+      const response = await API.post("submit", "/submit", {
+        body: { prompt: updatedContent, model: selectedModel },
+      });
+
+      // Handle response (e.g., save output to the database)
+      const generatedTexts = response[0];
+      const outputContent = generatedTexts?.generated_text || "No content generated";
+      const newOutput = {
+        promptId: selectedPrompt.promptId,
+        title: selectedPrompt.description,
+        content: outputContent,
+      };
+
+      await createOutput(newOutput);
+    } catch (e) {
+      onError(e);
+    } finally {
+      setShowVarModal(false); // Close the variable modal
+      setShowModal(false);
+    }
+  }
+
   function handleRun(promptId: string | undefined, description: string | undefined) {
     // Open the modal and set the selected prompt
     const selectedPrompt = prompts.find((p) => p.promptId === promptId);
@@ -97,40 +146,38 @@ export default function Home() {
 
   async function handleRunModel(model: string) {
     if (!selectedPrompt) return;
-
-    try {
-      const response = await API.post("submit", "/submit", {
-        body: { prompt: selectedPrompt.content, model },
-      });
-
-      const outputContent = response.data?.generated_text || "No content generated";
-      const newOutput = {
-        promptId: selectedPrompt.promptId,
-        title: selectedPrompt.description,
-        content: outputContent,
-      };
-
-      await createOutput(newOutput);
-
-      // You can add further actions here, like updating the UI or redirecting the user.
-    } catch (e) {
-      onError(e);
-    } finally {
+  
+    // Store the selected model
+    setSelectedModel(model);
+  
+    // Extract variables from the prompt content
+    const extractedVariables = extractVariables(selectedPrompt.content || "");
+    setVariables(extractedVariables);
+  
+    if (extractedVariables.length === 0) {
+      await handleSaveVariables();  // No variables, so just run the prompt
+    } else {
+      // Show the variable modal if there are variables to fill
       setShowModal(false);
+      setShowVarModal(true);
     }
   }
+  
+
 
   function renderPromptsList(prompts: PromptType[]) {
     return (
       <>
         {prompts.map(({ promptId, description, content, createdAt }) => (
           <ListGroup.Item key={promptId} action className="prompts-card">
-            <div className="card-header d-flex justify-content-between">
+            <div className="card-header">
               <LinkContainer to={`/prompts/${promptId}`}>
-                <div className="card-link">{truncateText(content ?? "", 20)}</div>
+                <div className="prompt-title">{truncateText(JSON.stringify(content) ?? "", 20)}</div>
               </LinkContainer>
               <Dropdown>
-                <Dropdown.Toggle as={BsThreeDotsVertical} id={`dropdown-${promptId}`} />
+                <Dropdown.Toggle as={Button} variant="link" className="custom-dropdown-toggle">
+                  <BsThreeDotsVertical />
+                </Dropdown.Toggle>
                 <Dropdown.Menu>
                   <Dropdown.Item onClick={() => handleRun(promptId, description)}>Run</Dropdown.Item>
                   <Dropdown.Item onClick={(e) => handleDelete(e, promptId)}>Delete</Dropdown.Item>
@@ -148,7 +195,7 @@ export default function Home() {
       </>
     );
   }
-
+  
   function renderLander() {
     return (
       <div className="lander">
@@ -179,10 +226,21 @@ export default function Home() {
             {!isLoading && renderPromptsList(prompts)}
           </div>
         </div>
+        {/* Model Selection Modal */}
         <ModelSelectionModal
           show={showModal}
           handleClose={() => setShowModal(false)}
-          handleRun={handleRunModel}
+          handleRun={handleRunModel} // Runs when the model is selected
+        />
+        
+        {/* Variable Input Modal */}
+        <VariableInputModal
+          show={showVarModal}
+          handleClose={() => setShowVarModal(false)}
+          handleSave={handleSaveVariables} // Save variables and run final output
+          variables={variables}
+          variableValues={variableValues}
+          setVariableValues={setVariableValues}
         />
       </>
     );

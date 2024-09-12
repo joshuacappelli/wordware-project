@@ -10,6 +10,10 @@ import Stack from "react-bootstrap/Stack";
 import LoaderButton from "../components/LoaderButton";
 import "./Prompts.css";
 import { s3Upload } from "../lib/awsLib";
+import AWS from "aws-sdk";
+
+// Initialize DynamoDB client
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 export default function Prompts() {
   const file = useRef<null | File>(null);
@@ -20,6 +24,7 @@ export default function Prompts() {
   const [description, setDescription] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [loadingId, setLoadingId] = useState<string | null>(null);
   const [errors, setErrors] = useState({ content: '', description: '' });
   const [outputs, setOutputs] = useState<Array<OutputType>>([]);
 
@@ -29,7 +34,10 @@ export default function Prompts() {
     }
 
     function loadOutputs() {
-      return API.get("outputs", `/prompts/${id}/outputs`, {});
+      return API.get("outputs", `/prompts/${id}/outputs`, {}).then(response => {
+        console.log("API Response for outputs:", response);
+        return response;
+      });
     }
 
     async function onLoad() {
@@ -122,15 +130,45 @@ export default function Prompts() {
     }
   }
 
+  async function handleDeleteOutput(output: OutputType) {
+    if (!output) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this output?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setLoadingId(output.outputId || null); // Set the loading ID to show loader for this specific output
+
+    try {
+      await API.del("outputs", `/outputs/${output.promptId}`, {});
+
+      // Remove the deleted output from the outputs list
+      setOutputs((prevOutputs) => prevOutputs.filter((out) => out.outputId !== output.outputId));
+    } catch (e) {
+      onError(e);
+    } finally {
+      setLoadingId(null); // Reset the loading state
+    }
+  }
+
   function deletePrompt() {
     return API.del("prompts", `/prompts/${id}`, {});
   }
+
+  function deleteOutput(output : OutputType) {
+    return API.del("outputs", `/outputs/${output.promptId}`, {});
+  }
+
 
   async function handleDelete(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
 
     const confirmed = window.confirm(
-      "Are you sure you want to delete this prompt?"
+      "Are you sure you want to delete this prompt and all associated outputs?"
     );
 
     if (!confirmed) {
@@ -140,7 +178,11 @@ export default function Prompts() {
     setIsDeleting(true);
 
     try {
+      // Delete the prompt
       await deletePrompt();
+
+      await Promise.all(outputs.map(output => deleteOutput(output)));
+
       nav("/");
     } catch (e) {
       onError(e);
@@ -219,7 +261,19 @@ export default function Prompts() {
             <h3>Outputs</h3>
             {outputs.map((output) => (
               <div key={output.outputId} className="output">
-                <p>{output.content}</p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <h1 style={{ marginRight: '10px' }}>
+                    {typeof output.title === 'string' ? output.title : JSON.stringify(output.title)}
+                  </h1>
+                  <LoaderButton
+                    variant="danger"
+                    onClick={() => handleDeleteOutput(output)}
+                    isLoading={loadingId === output.outputId} // Use this state to track loading per output
+                  >
+                    Delete
+                  </LoaderButton>
+                </div>
+                <p>{typeof output.content === 'string' ? output.content : JSON.stringify(output.content)}</p>
               </div>
             ))}
           </div>

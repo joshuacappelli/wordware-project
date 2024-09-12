@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import { Modal, Button, Dropdown, DropdownButton } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 
-
 interface ModelSelectionModalProps {
   show: boolean;
   handleClose: () => void;
-  handleRun: (model: string) => void;
+  handleRun: (model: string) => Promise<void>; // Change the return type to Promise<void>
 }
 
 function ModelSelectionModal({ show, handleClose, handleRun }: ModelSelectionModalProps) {
@@ -15,15 +14,26 @@ function ModelSelectionModal({ show, handleClose, handleRun }: ModelSelectionMod
 
   const models = [
     "gpt2",
-    "microsoft/DialoGPT-medium",
-    "facebook/bart-large",
+    "01-ai/Yi-Coder-1.5B-Chat",
+    "microsoft/Phi-3-mini-4k-instruct",
     "openai-gpt",
-    "EleutherAI/gpt-neo-2.7B",
+    "openai/whisper-large-v3",
   ];
 
   const handleModelSelect = (eventKey: string | null) => {
     if (eventKey) {
       setSelectedModel(eventKey);
+    }
+  };
+
+  const handleRunClick = async () => {
+    if (selectedModel) {
+      setIsLoading(true); // Start the loading animation
+      try {
+        await handleRun(selectedModel); // Wait for the handleRun function to complete
+      } finally {
+        setIsLoading(false); // Stop the loading animation
+      }
     }
   };
 
@@ -47,10 +57,11 @@ function ModelSelectionModal({ show, handleClose, handleRun }: ModelSelectionMod
         </Button>
         <LoaderButton
           variant="primary"
-          onClick={() => handleRun(selectedModel)}
+          onClick={handleRunClick}
           disabled={!selectedModel}
+          isLoading={isLoading} // Pass isLoading state to LoaderButton
         >
-          Run
+          Continue
         </LoaderButton>
       </Modal.Footer>
     </Modal>

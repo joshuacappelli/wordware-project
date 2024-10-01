@@ -32,15 +32,15 @@ export default function Login() {
     setIsLoading(true);
   
     try {
-      // await Auth.signIn(email, password); with the first two seperate hooks
-      Auth.signIn(fields.email, fields.password);
+      // Ensure that the sign-in process is awaited
+      await Auth.signIn(fields.email, fields.password);
       userHasAuthenticated(true);
-      
     } catch (error) {
-        onError(error);
-        setIsLoading(false);
-      }
+      onError(error);
+      setIsLoading(false); // Ensure loading stops on error
+    }
   }
+  
 
   return (
     <div className="Login">

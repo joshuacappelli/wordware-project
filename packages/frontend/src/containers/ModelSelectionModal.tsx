@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Modal, Button, Dropdown, DropdownButton } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 
 interface ModelSelectionModalProps {
   show: boolean;
   handleClose: () => void;
-  handleRun: (model: string) => Promise<void>; // Change the return type to Promise<void>
+  handleRun: (model: string) => Promise<void>; 
 }
 
 function ModelSelectionModal({ show, handleClose, handleRun }: ModelSelectionModalProps) {
@@ -14,20 +14,23 @@ function ModelSelectionModal({ show, handleClose, handleRun }: ModelSelectionMod
 
   const models = [
     "gpt2",
-    "01-ai/Yi-Coder-1.5B-Chat",
+    "meta-llama/Meta-Llama-3-8B-Instruct",
     "microsoft/Phi-3-mini-4k-instruct",
-    "openai-gpt",
+    "google/gemma-2-2b-it",
     "openai/whisper-large-v3",
   ];
 
   const handleModelSelect = (eventKey: string | null) => {
     if (eventKey) {
+      console.log("selected model is: ", eventKey);
       setSelectedModel(eventKey);
     }
   };
 
   const handleRunClick = async () => {
     if (selectedModel) {
+      console.log("setting loading to true");
+      console.log("model is ", selectedModel);
       setIsLoading(true); // Start the loading animation
       try {
         await handleRun(selectedModel); // Wait for the handleRun function to complete

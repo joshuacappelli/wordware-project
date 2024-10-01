@@ -10,11 +10,8 @@ import Stack from "react-bootstrap/Stack";
 import LoaderButton from "../components/LoaderButton";
 import "./Prompts.css";
 import { s3Upload } from "../lib/awsLib";
-import AWS from "aws-sdk";
 
 // Initialize DynamoDB client
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
-
 export default function Prompts() {
   const file = useRef<null | File>(null);
   const { id } = useParams();
@@ -95,10 +92,12 @@ export default function Prompts() {
 
     event.preventDefault();
 
+    // Validate form before proceeding
     if (!validateForm()) {
       return;
     }
 
+    // Validate file size if a file is selected
     if (file.current && file.current.size > config.MAX_ATTACHMENT_SIZE) {
       alert(
         `Please pick a file smaller than ${
@@ -108,27 +107,37 @@ export default function Prompts() {
       return;
     }
 
+    // Validate that the file is an MP3
+    if (file.current && file.current.type !== 'audio/mpeg') {
+      alert('Please select an MP3 file.');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
+      // Handle file upload if file exists
       if (file.current) {
         attachment = await s3Upload(file.current);
       } else if (prompt && prompt.attachment) {
         attachment = prompt.attachment;
       }
 
+      // Save the prompt with the attached MP3
       await savePrompt({
         ...prompt,
         content: content,
         description: description,
         attachment: attachment,
       });
+      
       nav("/");
     } catch (e) {
       onError(e);
       setIsLoading(false);
     }
   }
+
 
   async function handleDeleteOutput(output: OutputType) {
     if (!output) return;

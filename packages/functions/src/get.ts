@@ -3,13 +3,18 @@ import handler from "@wordware/core/handler";
 import dynamoDb from "@wordware/core/dynamodb";
 
 export const main = handler(async (event) => {
+  const userId = event.requestContext.authorizer?.iam.cognitoIdentity.identityId;
+  const promptId = event?.pathParameters?.id;
+  
+  if (!userId || !promptId) {
+    throw new Error("Missing userId or promptId.");
+  }
+
   const params = {
     TableName: Table.Prompts.tableName,
-    // 'Key' defines the partition key and sort key of
-    // the item to be retrieved
     Key: {
-      userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId, // The id of the author
-      promptId: event?.pathParameters?.id, // The id of the prompt from the path
+      userId,
+      promptId,
     },
   };
 

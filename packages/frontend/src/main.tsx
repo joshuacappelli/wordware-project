@@ -18,7 +18,9 @@ Amplify.configure({
   Storage: {
     region: config.s3.REGION,
     bucket: config.s3.BUCKET,
+    userPoolId: config.cognito.USER_POOL_ID,
     identityPoolId: config.cognito.IDENTITY_POOL_ID,
+    userPoolWebClientId: config.cognito.APP_CLIENT_ID,
   },
   API: {
     endpoints: [
@@ -34,6 +36,11 @@ Amplify.configure({
       },
       {
         name: "submit",
+        endpoint: config.apiGateway.URL + "/",
+        region: config.apiGateway.REGION,
+      },
+      {
+        name: "submitSound",
         endpoint: config.apiGateway.URL + "/",
         region: config.apiGateway.REGION,
       },

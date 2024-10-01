@@ -10,30 +10,53 @@
 
 
   .lander {
+    text-align: left !important;
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Align items to the start (left) */
-    justify-content: center;
+    align-items: center;
     
-    color: rgb(0, 0, 0);
-    text-align: left; /* Text align left */
-    padding: 20px;
-    padding-left: 50px; /* Add some padding to the left */
-  }
-  
-  
-  .lander h1 {
-    font-size: 3em;
-    margin-bottom: 20px;
-    font-weight: 700;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  }
-  
-  .lander p {
-    font-size: 1.5em;
-    max-width: 600px;
-    color: rgb(249, 189, 92)
-  }
+    
+}
+
+.lander-title {
+    position: relative;
+    font-weight: 600; /* font-semibold */
+    font-size: 2.5rem; /* 4xl */
+    line-height: 1.1; /* tight */
+    margin-top: 1.25rem; /* mt-5 */
+    letter-spacing: -0.02em; /* tracking-tight */
+}
+
+@media (min-width: 1280px) {
+    .lander-title {
+        font-size: 4rem; /* 6xl for larger screens */
+    }
+}
+
+.lander-subtitle {
+    color: #fed7aa; /* text-orange-200 */
+    font-weight: 100; /* font-extralight */
+    font-size: 2rem; /* 3xl */
+    font-style: italic; /* italic */
+    margin-top: 0.5rem;
+}
+
+@media (min-width: 1280px) {
+    .lander-subtitle {
+        font-size: 3rem; /* 5xl for larger screens */
+    }
+}
+
+/* Typewriter container */
+.typewriter-container {
+    display: flex;
+    text-align: left !important;
+    margin-top: 3rem;
+    font-size: 2rem;
+    font-family: 'Courier New', Courier, monospace;
+    color: #000000;
+}
+
 
   .prompts-container {
     padding: 20px;
